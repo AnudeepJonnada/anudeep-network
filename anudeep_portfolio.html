@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anudeep Jonnada — Network Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E11;
+    --panel:#121820;
+    --border:#1C2733;
+    --border-bright:#2A3A4A;
+    --text-dim:#8FA8B8;
+    --text-bright:#E8EDF1;
+    --green:#4FD1A5;
+    --amber:#E8B339;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text-dim);
+    font-family:var(--sans);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--green); color:#06120D;}
+
+  /* faint grid texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size:48px 48px;
+    opacity:0.25;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  a{color:var(--green); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .wrap{max-width:980px; margin:0 auto; padding:0 28px; position:relative; z-index:1;}
+
+  /* ---------- top status bar ---------- */
+  .statusbar{
+    border-bottom:1px solid var(--border);
+    background:rgba(18,24,32,0.7);
+    backdrop-filter:blur(6px);
+    position:sticky; top:0; z-index:50;
+  }
+  .statusbar-inner{
+    max-width:980px; margin:0 auto; padding:14px 28px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:var(--mono); font-size:12px; letter-spacing:0.04em;
+    color:var(--text-dim);
+  }
+  .statusbar-left{display:flex; align-items:center; gap:10px;}
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 0 0 rgba(79,209,165,0.5);
+    animation:pulse 2.2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(79,209,165,0.45);}
+    70%{box-shadow:0 0 0 7px rgba(79,209,165,0);}
+    100%{box-shadow:0 0 0 0 rgba(79,209,165,0);}
+  }
+  .statusbar-right{display:flex; gap:22px;}
+  .statusbar-right span{color:var(--text-bright);}
+  @media(max-width:640px){ .statusbar-right{display:none;} }
+
+  /* ---------- nav ---------- */
+  nav{
+    max-width:980px; margin:0 auto; padding:10px 28px 0;
+    display:flex; gap:24px; font-family:var(--mono); font-size:12.5px;
+  }
+  nav a{color:var(--text-dim);}
+  nav a:hover{color:var(--green); text-decoration:none;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:90px 0 70px;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; color:var(--amber);
+    letter-spacing:0.12em; margin-bottom:18px; display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:"//"; color:var(--border-bright);}
+  h1{
+    font-family:var(--sans); font-weight:700;
+    font-size:clamp(36px,6vw,58px);
+    color:var(--text-bright);
+    letter-spacing:-0.02em;
+    line-height:1.08;
+    margin-bottom:18px;
+  }
+  h1 .accent{color:var(--green);}
+  .hero-sub{
+    font-size:17px; max-width:560px; color:var(--text-dim); margin-bottom:32px;
+  }
+  .hero-tags{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:38px;}
+  .tag{
+    font-family:var(--mono); font-size:12px; color:var(--text-bright);
+    border:1px solid var(--border-bright); border-radius:3px;
+    padding:5px 10px; background:var(--panel);
+  }
+  .hero-cta{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    font-family:var(--mono); font-size:13px; padding:11px 20px;
+    border-radius:4px; border:1px solid var(--border-bright);
+    color:var(--text-bright); transition:all .15s ease;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{background:var(--green); color:#06120D; border-color:var(--green); font-weight:600;}
+  .btn-primary:hover{background:#3FC094; text-decoration:none;}
+  .btn-ghost:hover{border-color:var(--green); color:var(--green); text-decoration:none;}
+
+  /* network topology visual */
+  .topo{
+    margin-top:50px;
+    border:1px solid var(--border); border-radius:6px;
+    background:var(--panel);
+    padding:0;
+    overflow:hidden;
+  }
+  .topo-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 16px; border-bottom:1px solid var(--border);
+    font-family:var(--mono); font-size:11px; color:var(--text-dim);
+  }
+  .topo-head .lights{display:flex; gap:6px;}
+  .topo-head .lights span{width:7px;height:7px;border-radius:50%; background:var(--border-bright);}
+  svg.topo-svg{width:100%; display:block;}
+  .node{fill:var(--panel); stroke:var(--border-bright); stroke-width:1.5;}
+  .node-active{stroke:var(--green);}
+  .node-amber{stroke:var(--amber);}
+  .link{stroke:var(--border-bright); stroke-width:1.2;}
+  .pulse-dot{fill:var(--green);}
+  .nlabel{font-family:var(--mono); font-size:9.5px; fill:var(--text-dim);}
+
+  /* ---------- section shell ---------- */
+  section{padding:64px 0; border-top:1px solid var(--border);}
+  .sec-head{
+    display:flex; align-items:baseline; gap:12px; margin-bottom:30px;
+  }
+  .sec-index{font-family:var(--mono); color:var(--amber); font-size:13px;}
+  .sec-title{
+    font-family:var(--mono); font-size:13px; letter-spacing:0.14em;
+    color:var(--text-bright); text-transform:uppercase;
+  }
+  .sec-line{flex:1; height:1px; background:var(--border);}
+
+  /* panel utility */
+  .panel{
+    border:1px solid var(--border); background:var(--panel);
+    border-radius:6px; padding:22px 24px;
+    position:relative;
+  }
+  .panel::before{
+    content:""; position:absolute; top:-1px; left:-1px;
+    width:10px; height:10px;
+    border-top:1.5px solid var(--border-bright);
+    border-left:1.5px solid var(--border-bright);
+  }
+
+  /* about / summary */
+  .summary-text{font-size:16px; color:var(--text-dim); max-width:720px;}
+  .summary-text strong{color:var(--text-bright); font-weight:600;}
+
+  /* skills */
+  .skills-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+  @media(max-width:680px){.skills-grid{grid-template-columns:1fr;}}
+  .skill-cat{
+    border:1px solid var(--border); border-radius:6px; padding:18px 20px;
+    background:var(--panel);
+  }
+  .skill-cat-title{
+    font-family:var(--mono); font-size:11.5px; color:var(--amber);
+    letter-spacing:0.08em; margin-bottom:12px; text-transform:uppercase;
+  }
+  .skill-list{display:flex; flex-wrap:wrap; gap:7px;}
+  .skill-pill{
+    font-family:var(--mono); font-size:11.5px; color:var(--text-bright);
+    background:#0F151C; border:1px solid var(--border-bright);
+    border-radius:3px; padding:4px 8px;
+  }
+
+  /* projects */
+  .project{
+    border:1px solid var(--border); border-radius:6px; background:var(--panel);
+    padding:24px 26px; margin-bottom:20px;
+  }
+  .project-top{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:10px; flex-wrap:wrap;}
+  .project-title{font-family:var(--sans); font-size:19px; font-weight:600; color:var(--text-bright);}
+  .project-stack{font-family:var(--mono); font-size:11px; color:var(--text-dim); margin-top:4px;}
+  .project-badge{
+    font-family:var(--mono); font-size:10.5px; color:var(--green);
+    border:1px solid rgba(79,209,165,0.35); border-radius:3px;
+    padding:3px 8px; white-space:nowrap; height:fit-content;
+  }
+  .project ul{list-style:none; margin-top:12px; display:flex; flex-direction:column; gap:8px;}
+  .project li{padding-left:18px; position:relative; font-size:14.5px; color:var(--text-dim);}
+  .project li::before{content:"▸"; position:absolute; left:0; color:var(--border-bright); font-size:12px; top:1px;}
+
+  /* experience */
+  .exp-row{display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px; margin-bottom:6px;}
+  .exp-title{font-size:17px; font-weight:600; color:var(--text-bright);}
+  .exp-org{color:var(--text-dim); font-size:14.5px;}
+  .exp-dates{font-family:var(--mono); font-size:12px; color:var(--amber);}
+  .exp ul{list-style:none; margin-top:10px; display:flex; flex-direction:column; gap:8px;}
+  .exp li{padding-left:18px; position:relative; font-size:14.5px; color:var(--text-dim);}
+  .exp li::before{content:"▸"; position:absolute; left:0; color:var(--border-bright); font-size:12px; top:1px;}
+
+  /* education + certs */
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media(max-width:680px){.two-col{grid-template-columns:1fr;}}
+  .edu-item{margin-bottom:16px;}
+  .edu-school{color:var(--text-bright); font-weight:600; font-size:15px;}
+  .edu-meta{font-family:var(--mono); font-size:11.5px; color:var(--amber); margin:3px 0 6px;}
+  .edu-coursework{font-size:13px; color:var(--text-dim); font-style:italic;}
+  .cert-list{list-style:none; display:flex; flex-direction:column; gap:10px;}
+  .cert-list li{font-size:14px; color:var(--text-dim); padding-left:20px; position:relative;}
+  .cert-list li::before{content:"✓"; position:absolute; left:0; color:var(--green);}
+
+  /* contact / footer */
+  .contact-panel{
+    border:1px solid var(--border); border-radius:6px; background:var(--panel);
+    padding:40px 36px; text-align:center;
+  }
+  .contact-panel h2{font-size:28px; color:var(--text-bright); margin-bottom:12px;}
+  .contact-panel p{max-width:480px; margin:0 auto 26px; color:var(--text-dim);}
+  .contact-links{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+
+  footer{
+    padding:28px 0 40px; text-align:center;
+    font-family:var(--mono); font-size:11.5px; color:var(--border-bright);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .dot{animation:none;}
+    .pulse-dot{animation:none !important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="statusbar">
+  <div class="statusbar-inner">
+    <div class="statusbar-left">
+      <span class="dot"></span>
+      <span>STATUS: <span style="color:var(--green)">OPEN TO WORK</span></span>
+    </div>
+    <div class="statusbar-right">
+      <span>UPTIME <span>99.9%</span></span>
+      <span>LOCATION <span>WASHINGTON DC</span></span>
+      <span>ROLE <span>NETWORK ENGINEER</span></span>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <a href="#summary">Summary</a>
+  <a href="#skills">Skills</a>
+  <a href="#projects">Projects</a>
+  <a href="#experience">Experience</a>
+  <a href="#education">Education</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<div class="wrap">
+
+  <section class="hero" style="border-top:none;">
+    <div class="eyebrow">NOC / CLOUD INFRASTRUCTURE / CYBERSECURITY</div>
+    <h1>Keeping networks<br>up, <span class="accent">visible</span>,<br>and defended.</h1>
+    <p class="hero-sub">
+      Anudeep Jonnada — network engineer focused on packet-level troubleshooting,
+      infrastructure monitoring, and security operations across Linux-based,
+      distributed environments. AWS Academy certified, currently pursuing CCNA.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">TCP/IP</span>
+      <span class="tag">BGP / OSPF</span>
+      <span class="tag">Wireshark</span>
+      <span class="tag">AWS</span>
+      <span class="tag">Linux</span>
+      <span class="tag">MITRE ATT&CK</span>
+    </div>
+    <div class="hero-cta">
+      <a href="mailto:anudeepandy.reach@gmail.com" class="btn btn-primary">Email me →</a>
+      <a href="#projects" class="btn btn-ghost">View projects</a>
+      <a href="#" class="btn btn-ghost">Download resume</a>
+    </div>
+
+    <div class="topo">
+      <div class="topo-head">
+        <span>topology.monitor — live</span>
+        <div class="lights"><span style="background:var(--green)"></span><span></span><span></span></div>
+      </div>
+      <svg class="topo-svg" viewBox="0 0 920 220" xmlns="http://www.w3.org/2000/svg">
+        <line class="link" x1="120" y1="110" x2="300" y2="60"/>
+        <line class="link" x1="120" y1="110" x2="300" y2="160"/>
+        <line class="link" x1="300" y1="60" x2="500" y2="60"/>
+        <line class="link" x1="300" y1="160" x2="500" y2="160"/>
+        <line class="link" x1="500" y1="60" x2="500" y2="160"/>
+        <line class="link" x1="500" y1="60" x2="700" y2="40"/>
+        <line class="link" x1="500" y1="60" x2="700" y2="100"/>
+        <line class="link" x1="500" y1="160" x2="700" y2="140"/>
+        <line class="link" x1="500" y1="160" x2="700" y2="190"/>
+        <line class="link" x1="700" y1="100" x2="840" y2="100"/>
+
+        <circle class="node node-active" cx="120" cy="110" r="9"/>
+        <text class="nlabel" x="120" y="135" text-anchor="middle">CORE</text>
+
+        <circle class="node" cx="300" cy="60" r="7"/>
+        <circle class="node" cx="300" cy="160" r="7"/>
+        <text class="nlabel" x="300" y="40" text-anchor="middle">SW-A</text>
+        <text class="nlabel" x="300" y="185" text-anchor="middle">SW-B</text>
+
+        <circle class="node node-active" cx="500" cy="60" r="7"/>
+        <circle class="node node-amber" cx="500" cy="160" r="7"/>
+        <text class="nlabel" x="500" y="40" text-anchor="middle">RTR-1</text>
+        <text class="nlabel" x="500" y="185" text-anchor="middle">RTR-2</text>
+
+        <circle class="node" cx="700" cy="40" r="6"/>
+        <circle class="node node-active" cx="700" cy="100" r="6"/>
+        <circle class="node" cx="700" cy="140" r="6"/>
+        <circle class="node" cx="700" cy="190" r="6"/>
+
+        <circle class="node node-active" cx="840" cy="100" r="8"/>
+        <text class="nlabel" x="840" y="125" text-anchor="middle">CLOUD</text>
+
+        <circle class="pulse-dot" cx="120" cy="110" r="3">
+          <animate attributeName="cx" values="120;300;500;700;840" dur="3.2s" repeatCount="indefinite"/>
+          <animate attributeName="cy" values="110;60;60;100;100" dur="3.2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="1;1;1;1;0" dur="3.2s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+  </section>
+
+  <section id="summary">
+    <div class="sec-head">
+      <span class="sec-index">[01]</span><span class="sec-title">Summary</span><span class="sec-line"></span>
+    </div>
+    <p class="summary-text">
+      Network engineer with hands-on experience in <strong>TCP/IP</strong>, packet analysis
+      (Wireshark, tcpdump, Nmap/Zenmap), and infrastructure troubleshooting across Linux-based
+      and distributed environments. Skilled in <strong>network monitoring</strong>, anomaly detection,
+      and security-focused operations, with a track record of sustaining <strong>99.9% uptime</strong>
+      through proactive diagnostics and automation. AWS Academy Cloud certified, currently pursuing
+      <strong>CCNA</strong>, with strong interest in low-latency and trading infrastructure systems.
+      Recognized for packet capture skills — 2nd Place, Cybria Hacking Workshop.
+    </p>
+  </section>
+
+  <section id="skills">
+    <div class="sec-head">
+      <span class="sec-index">[02]</span><span class="sec-title">Technical Skills</span><span class="sec-line"></span>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-cat">
+        <div class="skill-cat-title">Networking</div>
+        <div class="skill-list">
+          <span class="skill-pill">TCP/IP</span><span class="skill-pill">OSI Model</span>
+          <span class="skill-pill">BGP</span><span class="skill-pill">OSPF</span>
+          <span class="skill-pill">VLANs</span><span class="skill-pill">VPNs</span>
+          <span class="skill-pill">STP</span><span class="skill-pill">Trunking</span>
+          <span class="skill-pill">ACLs</span><span class="skill-pill">NAT</span>
+          <span class="skill-pill">IGMP / PIM</span><span class="skill-pill">WAN/LAN Design</span>
+        </div>
+      </div>
+      <div class="skill-cat">
+        <div class="skill-cat-title">Network Tools</div>
+        <div class="skill-list">
+          <span class="skill-pill">Wireshark</span><span class="skill-pill">tcpdump</span>
+          <span class="skill-pill">Nmap</span><span class="skill-pill">Zenmap</span>
+          <span class="skill-pill">Netcat</span><span class="skill-pill">Splunk</span>
+          <span class="skill-pill">Packet Capture</span><span class="skill-pill">Traffic Diagnostics</span>
+        </div>
+      </div>
+      <div class="skill-cat">
+        <div class="skill-cat-title">Systems &amp; Security</div>
+        <div class="skill-list">
+          <span class="skill-pill">Linux (Ubuntu/Kali)</span><span class="skill-pill">Windows Server</span>
+          <span class="skill-pill">Bash</span><span class="skill-pill">Firewalls</span>
+          <span class="skill-pill">RBAC</span><span class="skill-pill">MITRE ATT&CK</span>
+          <span class="skill-pill">Honeypots</span><span class="skill-pill">Log Analysis</span>
+        </div>
+      </div>
+      <div class="skill-cat">
+        <div class="skill-cat-title">Automation &amp; Cloud</div>
+        <div class="skill-list">
+          <span class="skill-pill">Python</span><span class="skill-pill">Bash Scripting</span>
+          <span class="skill-pill">Docker</span><span class="skill-pill">GitHub Actions</span>
+          <span class="skill-pill">AWS (EC2/S3/Lambda)</span><span class="skill-pill">GCP</span>
+          <span class="skill-pill">Azure DevOps</span><span class="skill-pill">ServiceNow</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="sec-head">
+      <span class="sec-index">[03]</span><span class="sec-title">Key Projects</span><span class="sec-line"></span>
+    </div>
+
+    <div class="project">
+      <div class="project-top">
+        <div>
+          <div class="project-title">Network Monitoring &amp; Anomaly Detection System</div>
+          <div class="project-stack">Python · Flask · WebSockets · Linux · Docker</div>
+        </div>
+        <span class="project-badge">100+ NODES</span>
+      </div>
+      <ul>
+        <li>Built real-time monitoring system tracking 100+ network nodes with live alerting via WebSockets; implemented anomaly detection logic for traffic spikes, downtime detection, and system failures.</li>
+        <li>Designed for scalable observability with low-latency alert delivery, enabling near real-time detection and faster incident response across distributed nodes.</li>
+      </ul>
+    </div>
+
+    <div class="project">
+      <div class="project-top">
+        <div>
+          <div class="project-title">Honeypot Threat Intelligence Lab</div>
+          <div class="project-stack">Ubuntu · Cowrie · Dionaea · Docker Compose · MITRE ATT&CK</div>
+        </div>
+        <span class="project-badge">50+ VECTORS</span>
+      </div>
+      <ul>
+        <li>Deployed multi-service honeypot on Kali/Ubuntu Linux capturing SSH/Telnet and malware attempts; analyzed 50+ attack vectors mapped to MITRE ATT&CK.</li>
+        <li>Built log aggregation pipeline with automated correlation, producing structured threat intelligence outputs for proactive security analysis.</li>
+      </ul>
+    </div>
+
+    <div class="project">
+      <div class="project-top">
+        <div>
+          <div class="project-title">AI Phishing Email Detection System</div>
+          <div class="project-stack">Python · NLP · scikit-learn · Flask · Docker · Gmail API</div>
+        </div>
+        <span class="project-badge">94.3% ACCURACY</span>
+      </div>
+      <ul>
+        <li>ML classification pipeline achieving 94.3% accuracy on 1,000+ emails/week; deployed via REST API and containerized with Docker.</li>
+        <li>Exposed production-ready REST API with automated inference pipeline for real-time classification requests.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="experience" class="exp">
+    <div class="sec-head">
+      <span class="sec-index">[04]</span><span class="sec-title">Professional Experience</span><span class="sec-line"></span>
+    </div>
+    <div class="panel">
+      <div class="exp-row">
+        <span class="exp-title">IT Specialist &amp; Web Infrastructure Engineer</span>
+        <span class="exp-dates">Jun 2022 – Jul 2023</span>
+      </div>
+      <div class="exp-org">Sai Lakshya Private Limited</div>
+      <ul>
+        <li>Administered internal network infrastructure (Windows/Linux) for 20+ users; managed port configurations, firewall rules, access control, and system availability; resolved connectivity issues, reducing downtime by 30%.</li>
+        <li>Coordinated with hardware/network vendors for issue resolution; maintained and optimized web infrastructure (React + PostgreSQL), improving system responsiveness and traffic performance by 60%.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="education">
+    <div class="sec-head">
+      <span class="sec-index">[05]</span><span class="sec-title">Education &amp; Certifications</span><span class="sec-line"></span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="edu-item">
+          <div class="edu-school">George Mason University</div>
+          <div class="edu-meta">M.S. Information Systems — Fairfax, VA</div>
+          <div class="edu-coursework">Cloud Security, Big Data Analytics, Software Engineering, Software Project Management, Rapid Information Systems</div>
+        </div>
+        <div class="edu-item">
+          <div class="edu-school">Raghu Engineering College (JNTU-GV)</div>
+          <div class="edu-meta">B.S. Cybersecurity — AP, India</div>
+          <div class="edu-coursework">Computer Networks, Network Security, Malware Analysis, Cryptography, Network Simulation, FOSS Lab</div>
+        </div>
+      </div>
+      <div class="panel">
+        <ul class="cert-list">
+          <li>AWS Academy Cloud Foundations &amp; Architecture — Amazon Web Services</li>
+          <li>SAP Cybersecurity Job Simulation — SAP (Forage)</li>
+          <li>Java Full Stack Development — Wipro Certified</li>
+          <li>Publication: <em>Identifying Counterfeit Products Using Blockchain</em> — IJCRT, Apr 2024</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="contact-panel">
+      <h2>Let's talk infrastructure.</h2>
+      <p>Open to NOC, cloud infrastructure, and security operations roles. Based in Washington DC — willing to relocate.</p>
+      <div class="contact-links">
+        <a href="mailto:anudeepandy.reach@gmail.com" class="btn btn-primary">anudeepandy.reach@gmail.com</a>
+        <a href="tel:7039394516" class="btn btn-ghost">(703) 939-4516</a>
+        <a href="#" class="btn btn-ghost">LinkedIn</a>
+        <a href="#" class="btn btn-ghost">GitHub</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  © 2026 ANUDEEP JONNADA — BUILT WITH UPTIME IN MIND
+</footer>
+
+</body>
+</html>
